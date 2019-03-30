@@ -128,6 +128,28 @@ func getPubKeyFromHex(key string) ecdsa.PublicKey {
 		Y:     y,
 	}
 
+	fmt.Println("X ", pubKey.X)
+	fmt.Println("Y ", pubKey.Y)
+
+	return pubKey
+}
+
+func GetPubKeyFromXY(x, y string) string {
+
+	X := new(big.Int)
+	X, ok := X.SetString(x, 10)
+	if !ok {
+		return ""
+	}
+
+	Y := new(big.Int)
+	Y, ok = Y.SetString(y, 10)
+	if !ok {
+		return ""
+	}
+
+	pubKey := enc.Encode(elliptic.Marshal(elliptic.P256(), X, Y))
+
 	return pubKey
 }
 
