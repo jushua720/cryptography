@@ -44,8 +44,6 @@ public class ecdsa {
   private static final String curveName = "P-256";
   
   
-  // @check: Names
-  
   public static PrivateKey getPrivateKey(String key) throws Exception {
     
     BigInteger bintKey = new BigInteger(key, 16);
@@ -119,7 +117,6 @@ public class ecdsa {
     return signedMsg;
   }
   
-  // @note: combine R S functions into one 
   public static BigInteger getRFromSignature(byte[] signature) throws Exception {
     int startR = (signature[1] & 0x80) != 0 ? 3 : 2;
     int lengthR = signature[startR + 1];
@@ -139,15 +136,6 @@ public class ecdsa {
     MessageDigest msgDigest = MessageDigest.getInstance("SHA-256");
     byte[] hash = msgDigest.digest(s.getBytes(StandardCharsets.UTF_8));
     
-    // @note: clean / leave
-    
-    /*
-     for (int i = 0; i < hash.length; i++) {
-     System.out.print(hash[i]);
-     System.out.println("sha256"); 
-     }  
-     */
-    
     String strHash = b58encode(hash);
     
     return strHash;
@@ -164,7 +152,7 @@ public class ecdsa {
     KeyPair keys = keyGenerator.generateKeyPair();
     
     
-    String privKey = pKeyToString(keys.getPrivate());
+    String privKey = privKeyToString(keys.getPrivate());
     String pubKey = pubKeyToString(keys.getPublic());
     
     keyPair[0] = privKey;
@@ -173,8 +161,7 @@ public class ecdsa {
     return keyPair;  
   }
   
-  
-  // @note: optimize key to string into 1 function for priv and public
+
   public static String pubKeyToString(PublicKey pubKey) throws Exception  {
     
     byte[] byteKey = pubKey.getEncoded(); 
@@ -182,7 +169,7 @@ public class ecdsa {
     
     return strKey;
   }
-  public static String pKeyToString(PrivateKey privKey) throws GeneralSecurityException {
+  public static String privKeyToString(PrivateKey privKey) throws GeneralSecurityException {
     
     KeyFactory factory = KeyFactory.getInstance("EC");
     PKCS8EncodedKeySpec keySpec = factory.getKeySpec(privKey, PKCS8EncodedKeySpec.class);
@@ -221,7 +208,7 @@ public class ecdsa {
   public static byte[] b58decode(String str) {
     
     int leadingZeros = 0;
-    byte[] byteInt = decodeToBigInteger(str).toByteArray();
+    byte[] byteInt = convertToBigInteger(str).toByteArray();
     boolean stripSignByte = byteInt.length > 1 && byteInt[0] == 0 && byteInt[1] < 0;
     
     for (int i = 0; str.charAt(i) == base58Table.charAt(0); i++) {
@@ -235,7 +222,7 @@ public class ecdsa {
   }
   
   
-  public static BigInteger decodeToBigInteger(String str) {
+  public static BigInteger convertToBigInteger(String str) {
     
     BigInteger bInt = BigInteger.valueOf(0);
     
@@ -258,7 +245,6 @@ public class ecdsa {
     
     EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encodedPriv);
     
-    // @ note: or change factory to kf everywhere
     KeyFactory factory = KeyFactory.getInstance("ECDSA", "BC");
     PrivateKey priv = factory.generatePrivate(keySpec);
     
@@ -307,7 +293,7 @@ public class ecdsa {
     
     encryptedMsg = new byte[cipher.getOutputSize(byteMsg.length)];
     
-    //@check: nuzni li jeti strocki
+
     int encLength = cipher.update(byteMsg, 0, byteMsg.length, encryptedMsg, 0);
     encLength += cipher.doFinal(encryptedMsg, encLength);
     
@@ -349,8 +335,6 @@ public class ecdsa {
     
     String encryptedMsg = encryptMessage(keys[1], plainTxt);
     String decryptedMsg = decryptMessage(keys[0], encryptedMsg);
-    
-    // @note: signature is byte but use String and check empty string => arg to verifySignature function
     
     String signedMsg = signMessage(keys[0], plainTxt); 
     Boolean isVerified = verifySignature(keys[1], signedMsg, plainTxt); 
