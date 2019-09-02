@@ -2,7 +2,7 @@
 
 Program written to implement ECDSA (Elliptic Curve Digital Signature Algorithm) algorithm.
 
-It is possible to sign a message with private key generated in GoLang program. 
+It is possible to sign a message with private key generated in [GoLang program](https://github.com/jushua720/chaincode/blob/master/votingCC/utils/access/access.go). 
 
 R, S values extracted from the signature and X, Y coordinates of public key received from the given private key can be used to verify signature in GoLang program [which is implemented in voting chaincode - ssilka] 
 
